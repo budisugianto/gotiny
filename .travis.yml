@@ -7,7 +7,7 @@ go:
   - "master"
 
 install:
-  - go get github.com/niubaoshu/goutils
+  - go get github.com/budisugianto/goutils
 
 script:
   - go test  .
