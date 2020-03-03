@@ -1,4 +1,4 @@
-module github.com/niubaoshu/gotiny
+module github.com/budisugianto/gotiny
 
 go 1.12
 
