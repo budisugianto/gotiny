@@ -1,6 +1,8 @@
 package gotiny
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"sync"
 	"time"
@@ -72,17 +74,17 @@ func getDecEngine(rt reflect.Type) decEng {
 	return engine
 }
 
-func buildDecEngine(rt reflect.Type, engPtr *decEng) {
+func buildDecEngine(rt reflect.Type, engPtr *decEng) error {
 	engine, has := rt2decEng[rt]
 	if has {
 		*engPtr = engine
-		return
+		return nil
 	}
 
 	if _, engine = implementOtherSerializer(rt); engine != nil {
 		rt2decEng[rt] = engine
 		*engPtr = engine
-		return
+		return nil
 	}
 
 	kind := rt.Kind()
@@ -178,7 +180,8 @@ func buildDecEngine(rt reflect.Type, engPtr *decEng) {
 				decString(d, unsafe.Pointer(&name))
 				et, has := name2type[name]
 				if !has {
-					panic("unknown typ:" + name)
+					fmt.Println("unknown typ:" + name)
+					return
 				}
 				v := reflect.NewAt(rt, p).Elem()
 				var ev reflect.Value
@@ -194,10 +197,11 @@ func buildDecEngine(rt reflect.Type, engPtr *decEng) {
 			}
 		}
 	case reflect.Chan, reflect.Func:
-		panic("not support " + rt.String() + " type")
+		return errors.New("not support " + rt.String() + " type")
 	default:
 		engine = baseDecEngines[kind]
 	}
 	rt2decEng[rt] = engine
 	*engPtr = engine
+	return nil
 }

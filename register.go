@@ -1,6 +1,7 @@
 package gotiny
 
 import (
+	"errors"
 	"reflect"
 	"strconv"
 )
@@ -123,22 +124,23 @@ func registerType(rt reflect.Type) string {
 	return name
 }
 
-func RegisterName(name string, rt reflect.Type) {
+func RegisterName(name string, rt reflect.Type) error {
 	if name == "" {
-		panic("attempt to register empty name")
+		return errors.New("attempt to register empty name")
 	}
 
 	if rt == nil || rt.Kind() == reflect.Invalid {
-		panic("attempt to register nil type or invalid type")
+		return errors.New("attempt to register nil type or invalid type")
 	}
 
 	if _, has := type2name[rt]; has {
-		panic("gotiny: registering duplicate types for " + GetNameByType(rt))
+		return errors.New("gotiny: registering duplicate types for " + GetNameByType(rt))
 	}
 
 	if _, has := name2type[name]; has {
-		panic("gotiny: registering name" + name + " is exist")
+		return errors.New("gotiny: registering name" + name + " is exist")
 	}
 	name2type[name] = rt
 	type2name[rt] = name
+	return nil
 }
